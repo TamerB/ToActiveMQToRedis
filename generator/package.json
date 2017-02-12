@@ -1,0 +1,17 @@
+{
+  "name": "generator",
+  "version": "1.0.0",
+  "description": "Generates JSON to ActiveMQ",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Tamer Bahgat",
+  "license": "ISC",
+  "dependencies": {
+    "moment": "^2.17.1",
+    "node-schedule": "^1.2.0",
+    "node-uuid": "^1.4.7",
+    "stompit": "^0.24.0"
+  }
+}
