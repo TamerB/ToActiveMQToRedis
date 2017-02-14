@@ -38,7 +38,7 @@ schedule.scheduleJob({ start: startTime, end: endTime, rule: '*/1 * * * * *' }, 
 			return;
 		}
 
-		for (i = 1 ; i <= 50 ; i++){
+		for (i = 1 ; i <= 250 ; i++){
 			//x = new Date(Date.now());
 			obj.message_id = uuid.v1();
 			obj.sm_timestamp = moment().format('YYYY-MM-DDTHH:mm:ss.SSS');
@@ -47,7 +47,7 @@ schedule.scheduleJob({ start: startTime, end: endTime, rule: '*/1 * * * * *' }, 
 			frame.end();
 			//y = new Date(Date.now());
 			//console.log(y - x);
- 			sleep.msleep(19);
+ 			sleep.msleep(3);
 		}
 		client.disconnect();
 	});
