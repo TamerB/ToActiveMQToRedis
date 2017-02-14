@@ -4,6 +4,7 @@ var moment = require('moment');
 var uuid = require('node-uuid');
 const stompit = require('stompit');
 var schedule = require('node-schedule');
+var sleep = require('sleep');
 
 var obj = {
 	account_id : '100',
@@ -27,21 +28,27 @@ var obj = {
 
 let startTime = new Date(Date.now());
 let endTime = new Date(Date.now() + 1800000);
+var frame;
+var i, x, y;
 schedule.scheduleJob({ start: startTime, end: endTime, rule: '*/1 * * * * *' }, function() {
+
 	stompit.connect({ host: 'localhost', port: 61613 }, function(err, client) {
 		if(err){
 			console.log('connect error : ' + err.message);
 			return;
 		}
-		const frame = client.send({ destination: 'MyQueue', 'content-type' : 'application/json' });
-		var i = 1;
-		while(i <= 2){
+
+		for (i = 1 ; i <= 50 ; i++){
+			//x = new Date(Date.now());
 			obj.message_id = uuid.v1();
 			obj.sm_timestamp = moment().format('YYYY-MM-DDTHH:mm:ss.SSS');
-			frame.write(JSON.stringify(obj) + '\n');
- 			i++;
+			var frame = client.send({ destination: 'MyQueue', 'content-type' : 'application/json' });
+			frame.write(JSON.stringify(obj));
+			frame.end();
+			//y = new Date(Date.now());
+			//console.log(y - x);
+ 			sleep.msleep(19);
 		}
-		frame.end();
 		client.disconnect();
 	});
 });
