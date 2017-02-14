@@ -1,7 +1,7 @@
 'use strict';
 
 var moment = require('moment');
-var uuid = require('node-uuid');
+var uuid = require('uuid/v1');
 const stompit = require('stompit');
 var schedule = require('node-schedule');
 var sleep = require('sleep');
@@ -40,7 +40,7 @@ schedule.scheduleJob({ start: startTime, end: endTime, rule: '*/1 * * * * *' }, 
 		}
 
 		for (i = 1 ; i <= 250 ; i++){
-			obj.message_id = uuid.v1();
+			obj.message_id = uuid();
 			obj.sm_timestamp = moment().format('YYYY-MM-DDTHH:mm:ss.SSS');
 			var frame = client.send({ destination: 'MyQueue', 'content-type' : 'application/json' });
 			frame.write(JSON.stringify(obj));

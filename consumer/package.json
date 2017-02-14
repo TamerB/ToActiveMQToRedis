@@ -9,8 +9,9 @@
   "author": "Tamer Bahgat",
   "license": "ISC",
   "dependencies": {
+    "ioredis": "^2.5.0",
     "moment": "^2.17.1",
-    "node-uuid": "^1.4.7",
-    "stompit": "^0.24.0"
+    "stompit": "^0.24.0",
+    "uuid": "^3.0.1"
   }
 }

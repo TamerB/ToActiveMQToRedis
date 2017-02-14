@@ -2,7 +2,7 @@
 
 const stompit = require('stompit');
 var moment = require('moment');
-var uuid = require('node-uuid');
+var uuid = require('uuid/v1');
 var Redis = require('ioredis');
 
 var redis = new Redis();
@@ -54,7 +54,7 @@ function pushToRedis(arr){
 
   arr.forEach((record)=>{
     record.redis_timestamp = moment().format('YYY-MM-DDTHH:mm:ss.SSS');
-    pipeline.set(uuid.v1(), JSON.stringify(record));
+    pipeline.set(uuid(), JSON.stringify(record));
   });
 
   pipeline.exec(function(err4, results) {
