@@ -8,7 +8,7 @@ var Redis = require('ioredis');
 var redis = new Redis();
 var msgBuffer=[]; 
 let lock = false;
-var patch;
+var batch;
 stompit.connect({ host: 'localhost', port: 61613 }, function(err1, client) {
   if(err1){
     console.log('connection error : ' + err1.message);
@@ -34,8 +34,8 @@ stompit.connect({ host: 'localhost', port: 61613 }, function(err1, client) {
       msgBuffer.push(record);
 
       while(msgBuffer.length >= 20 && ! lock){
-        patch = msgBuffer.splice(0,19);
-        pushToRedis(patch);
+        batch = msgBuffer.splice(0,19);
+        pushToRedis(batch);
       }    
 
     });
@@ -43,7 +43,7 @@ stompit.connect({ host: 'localhost', port: 61613 }, function(err1, client) {
 });
 
 function pushToRedis(arr){
-  console.log("pushing the patch to redis") 
+  console.log("pushing the batch to redis") 
   
   var pipeline = redis.pipeline();
     if (msgBuffer.length < 20){
@@ -64,7 +64,7 @@ function pushToRedis(arr){
     lock=false;
     console.log(JSON.stringify(results));
   });
-  console.log("patch of " + arr.length); 
+  console.log("batch of " + arr.length); 
 }
 
 process.stdin.resume();
@@ -72,8 +72,8 @@ process.stdin.resume();
 function exitHandler(options, err5){
     if (options.cleanup) {
         while(msgBuffer.length >= 20 && ! lock){
-            patch = msgBuffer.splice(0,20);
-            pushToRedis(patch);
+            batch = msgBuffer.splice(0,20);
+            pushToRedis(batch);
         }
         if (msgBuffer.length > 0 && msgBuffer.length < 20){
             pushToRedis(msgBuffer);
