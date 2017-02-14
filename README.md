@@ -13,4 +13,5 @@ To run this application :
 
 
 Issues:
-- Number of records per batch sent to Redis may not be controlled whith high messaging frequency on ActiveMQ due to callback functions.
+- Number of records per batch sent to Redis may not be controlled whith high messaging frequency on ActiveMQ due to callback functions (Fixed, but looking for a better approach).
+- Some messages might be lost with sudden exit of consumer application (Fixed).
