@@ -9,7 +9,6 @@ var redis = new Redis();
 var msgBuffer=[]; 
 let lock = false;
 var patch;
-
 stompit.connect({ host: 'localhost', port: 61613 }, function(err1, client) {
   if(err1){
     console.log('connection error : ' + err1.message);
@@ -35,7 +34,7 @@ stompit.connect({ host: 'localhost', port: 61613 }, function(err1, client) {
       msgBuffer.push(record);
 
       while(msgBuffer.length >= 20 && ! lock){
-        patch = msgBuffer.splice(0,20);
+        patch = msgBuffer.splice(0,19);
         pushToRedis(patch);
       }    
 
@@ -65,7 +64,7 @@ function pushToRedis(arr){
     lock=false;
     console.log(JSON.stringify(results));
   });
-  console.log("patch of " + arr.length + " sent"); 
+  console.log("patch of " + arr.length); 
 }
 
 process.stdin.resume();
@@ -76,7 +75,7 @@ function exitHandler(options, err5){
             patch = msgBuffer.splice(0,20);
             pushToRedis(patch);
         }
-        if (msgBuffer > 0 && msgBuffer < 20){
+        if (msgBuffer.length > 0 && msgBuffer.length < 20){
             pushToRedis(msgBuffer);
         }
         process.exit();
