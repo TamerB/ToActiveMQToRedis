@@ -4,12 +4,14 @@ const stompit = require('stompit');
 var moment = require('moment');
 var uuid = require('uuid/v1');
 var Redis = require('ioredis');
+//var redis2 = require('redis');
 
 var redis = new Redis();
 var msgBuffer=[]; 
 let lock = false;
 var batch;
-stompit.connect({ host: 'localhost', port: 61613 }, function(err1, client) {
+
+stompit.connect({ host: 'localhost', port: 61613 }, function(err1, client) {  
   if(err1){
     console.log('connection error : ' + err1.message);
     return;
@@ -27,17 +29,16 @@ stompit.connect({ host: 'localhost', port: 61613 }, function(err1, client) {
         return;
       }
 
-      console.log("buff size"+ msgBuffer.length,lock);
+      console.log("buff size "+ msgBuffer.length,lock);
 
       var record = {};
       record = JSON.parse(body);
       msgBuffer.push(record);
 
       while(msgBuffer.length >= 20 && ! lock){
-        batch = msgBuffer.splice(0,19);
+        batch = msgBuffer.splice(0,20);
         pushToRedis(batch);
       }    
-
     });
   });
 });
@@ -46,7 +47,7 @@ function pushToRedis(arr){
   console.log("pushing the batch to redis") 
   
   var pipeline = redis.pipeline();
-    if (msgBuffer.length < 20){
+    if (msgBuffer.length <= 20){
         lock=true;
     }
 
@@ -70,18 +71,39 @@ function pushToRedis(arr){
 process.stdin.resume();
 
 function exitHandler(options, err5){
-    if (options.cleanup) {
-        while(msgBuffer.length >= 20 && ! lock){
-            batch = msgBuffer.splice(0,20);
-            pushToRedis(batch);
+  if (options.cleanup) {
+      while(msgBuffer.length >= 20 && ! lock){
+          batch = msgBuffer.splice(0,20);
+          pushToRedis(batch);
+      }
+      if (msgBuffer.length > 0 && msgBuffer.length < 20 && ! lock){
+          pushToRedis(msgBuffer);
+      }
+
+      process.exit();
+      
+      /*var redisClient = redis2.createClient(6379 , 'localhost');
+
+      redisClient.on('error', function(e){
+        console.log('Error creating redis socket connection : ' + e);
+      });
+
+      redisClient.keys('*', function(err, reply){
+        if (err){
+          console.log('redis error : ' + err.message);
         }
-        if (msgBuffer.length > 0 && msgBuffer.length < 20){
-            pushToRedis(msgBuffer);
-        }
+        
+        console.log("reply length: " + reply.length + " + the final batch");
         process.exit();
-    }
+      });*/
+
+  }
 }
 
 process.on('exit', exitHandler.bind(null, {cleanup : true}));
 process.on('SIGINT', exitHandler.bind(null, {cleanup : true}));
 process.on('uncaughtException', exitHandler.bind(null, {cleanup : true}));
+
+
+
+

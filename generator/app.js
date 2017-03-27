@@ -4,7 +4,6 @@ var moment = require('moment');
 var uuid = require('uuid/v1');
 const stompit = require('stompit');
 var schedule = require('node-schedule');
-var sleep = require('sleep');
 
 var obj = {
 	account_id : '100',
@@ -26,10 +25,10 @@ var obj = {
 	dlr_port : 201
 }
 
-let startTime = new Date(Date.now());
-let endTime = new Date(Date.now() + 1800000);
+let startTime = new Date(Date.now() + 1000);
+let endTime = new Date(startTime.getTime() + 1800000);
 var frame;
-var i;
+var i=0;
 
 schedule.scheduleJob({ start: startTime, end: endTime, rule: '*/1 * * * * *' }, function() {
 
@@ -45,9 +44,12 @@ schedule.scheduleJob({ start: startTime, end: endTime, rule: '*/1 * * * * *' }, 
 			var frame = client.send({ destination: 'MyQueue', 'content-type' : 'application/json' });
 			frame.write(JSON.stringify(obj));
 			frame.end();
-
- 			sleep.msleep(3);
+			sleep(4);
 		}
 		client.disconnect();
 	});
 });
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
